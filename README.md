@@ -1,60 +1,56 @@
-# Harvia Sauna integration for Home Assistant
+# Harvia Sauna MCP Server
 
-[![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
+MCP (Model Context Protocol) server for controlling Harvia Xenio WiFi sauna controllers through Claude Code. Uses the same backend API as the MyHarvia mobile app.
 
-Unofficial Home Assistant component for Harvia Sauna (working with Xenio Wifi), using the same API as the MyHarvia App.
+## Setup
 
+1. Install the package:
 
-## WARNING: Pre-alpha development release
+```bash
+pip install -e .
+```
 
-*This component is still in 'pre-alpha' and can exhibit unpredictable behavior. I have tested the component for a few days now and it seems to be quite stable. I have now managed to run the component for a day without it breaking. I would appreciate it if you install the component so that I can gather information and feedback to improve the component. After all, I only have one sauna and without extensive testing it won't get better. Keep an eye on this page..* 
+2. Register with Claude Code, providing your MyHarvia credentials:
 
-(updated at April 9, 2024)
+```bash
+claude mcp add harvia-sauna \
+  -e HARVIA_USERNAME=you@example.com \
+  -e HARVIA_PASSWORD=yourpass \
+  -- python -m mcp_server
+```
 
-Components support at the moment:
+3. Restart Claude Code. Then you can use natural language:
+   - "What's my sauna status?"
+   - "Turn on the sauna"
+   - "Set the temperature to 175"
+   - "Turn on the lights"
 
-- Light switch
-- Power switch (enables heater)
-- Fan switch
-- Termostat (current and target temp)
-- Door sensor (safety circuit)
+## Available Tools
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `list_devices` | List all sauna devices on the account | none |
+| `get_sauna_status` | Full status (temp, humidity, power, lights, etc.) | `device_id?` |
+| `turn_sauna_on` | Power on the heater | `device_id?` |
+| `turn_sauna_off` | Power off the heater | `device_id?` |
+| `set_temperature` | Set target temp in Fahrenheit (104-230) | `temperature`, `device_id?` |
+| `toggle_lights` | Lights on/off | `on`, `device_id?` |
+| `toggle_steamer` | Steamer on/off | `on`, `device_id?` |
+| `toggle_fan` | Fan on/off | `on`, `device_id?` |
+| `set_humidity` | Set target humidity (0-140%) | `humidity`, `device_id?` |
+
+All tools with `device_id?` auto-resolve to the first device in single-device setups.
+
+## Testing with MCP Inspector
+
+```bash
+npx @modelcontextprotocol/inspector python -m mcp_server
+```
 
 ## Compatibility
-Component has been tested with the Harvia Xenio Wifi (CX001WIFI) and Harvia Cilindro PC90XE, but may also work with other sauna's compatible with the MyHarvia app, as it uses the same API.
 
-## Installation
-
-Add a custom repository [https://github.com/RubenHarms/ha-harvia-xenio-wifi/](https://github.com/RubenHarms/ha-harvia-xenio-wifi/) to HACS and search for Harvia Sauna to install.
-Restart Homeassistant 
-
-## Configuration
-
-Go to settings, integrations and add 'Harvia Sauna'
-Your username and password is corresponding with the MyHarvia app.
-
-<!-- ## Limitations
-
-- You dont't get any message when the door of your sauna is open and you can't start the heater.  -->
-
-<!--
-## Known issues
-
-- Connection interruption ensures that no new sauna updates are received as no 'reconnect' mechanism has yet been created for web sockets. You need to restart HA in order to reset the component. -->
-
-
-## Road map (short term)
-
-- Adding [Device Triggers](https://developers.home-assistant.io/docs/device_automation_trigger): Ready, Turned-off, Turned-On, Heating etc...
-- Support for Steamer
-- Suppport to schedule Single Session timed start
-
-<!-- Please do! Open a Pull Request with your improvements. -->
-
+Tested with the Harvia Xenio WiFi (CX001WIFI). Should work with any sauna controller compatible with the MyHarvia app.
 
 ## Credits
 
-This integration was developed by Ruben Harms. It uses the unofficial API of Harvia Xenio WiFi controllers and is not directly associated with Harvia.
-
-[home-assistant-harvia-sauna]: https://github.com/RubenHarms/ha-harvia-xenio-wifi
-[buymecoffee]: https://www.buymeacoffee.com/rubenharms
-[buymecoffeebadge]: https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png
+Based on the Home Assistant integration by Ruben Harms. Uses the unofficial MyHarvia API and is not associated with Harvia.
